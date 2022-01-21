@@ -10,22 +10,21 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
 
-with open("imp.json", 'r') as I_var:
-    Token = json.load("Token")
+# with open("imp.json", 'r') as I_var:
+#     Token = json.load("Token")
 
 
-with open("message.json", 'r') as VI_var:
-    help_str = json.load("help_str")
+# with open("message.json", 'r') as VI_var:
+#     help_str = json.load("help_str")
 
+help_str = "Available Commands :- \n/youtube - To get the youtube URL \n/linkedin - To get the LinkedIn profile URL \n/gmail - To get gmail URL"
 
-updater = Updater(Token, use_context=True)
+updater = Updater("5096756308:AAETy41R7MFwGv_xD5_oeRc3Qj6WlSlQhJg", use_context=True)
 
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text("Hello sir, Welcome to the Bot.Please write\
         /help to see the commands available.")
-    time.sleep(5)
-    update.message.reply_text("yo!")
 
 
 def help(update: Update, context: CallbackContext):
