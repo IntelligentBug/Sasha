@@ -1,91 +1,55 @@
-# unwanted things?
-import json
-import time
-# telegram inputs
-from telegram.ext.updater import Updater
-from telegram.update import Update
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.commandhandler import CommandHandler
-from telegram.ext.messagehandler import MessageHandler
-from telegram.ext.filters import Filters
+import telebot
+
+# from telebot import apihelper
+# apihelper.proxy = {
+#     'https':'socks5://login:password@ip:port'}
 
 
-# with open("imp.json", 'r') as I_var:
-#     Token = json.load("Token")
+token = "5096756308:AAETy41R7MFwGv_xD5_oeRc3Qj6WlSlQhJg"
+
+bot = telebot.TeleBot(token)
 
 
-# with open("message.json", 'r') as VI_var:
-#     help_str = json.load("help_str")
-
-help_str = "Available Commands :- \n/youtube - To get the youtube URL \n/linkedin - To get the LinkedIn profile URL \n/gmail - To get gmail URL"
-
-updater = Updater("5096756308:AAETy41R7MFwGv_xD5_oeRc3Qj6WlSlQhJg", use_context=True)
-
-
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("Hello sir, Welcome to the Bot.Please write\
-        /help to see the commands available.")
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    keyboard = telebot.types.ReplyKeyboardMarkup(True)
+    keyboard.row('Hello', 'Bye')
+    bot.send_message(message.chat.id, 'Hello!', reply_markup=keyboard)
 
 
-def help(update: Update, context: CallbackContext):
-    update.message.reply_text(help_str)
+@bot.message_handler(commands=['test'])
+def start_message2(message):
+    markup = telebot.types.InlineKeyboardMarkup()
+    markup.add(telebot.types.InlineKeyboardButton(
+        text='Three', callback_data=3))
+    markup.add(telebot.types.InlineKeyboardButton(
+        text='Four', callback_data=4))
+    markup.add(telebot.types.InlineKeyboardButton(
+        text='Five', callback_data=5))
+    bot.send_message(
+        message.chat.id, text="How much is 2 plus 2?", reply_markup=markup)
 
 
-def gmail_url(update: Update, context: CallbackContext):
-    update.message.reply_text("test@test.com (I am not\
-        giving mine one for security reasons)")
+@bot.message_handler(content_types=['text'])
+def send_text(message):
+    if message.text.lower() == 'hello':
+        bot.send_message(message.chat.id, 'Hello again!')
+    elif message.text.lower() == 'bye':
+        bot.send_message(message.chat.id, 'Bye!')
 
 
-def youtube_url(update: Update, context: CallbackContext):
-    update.message.reply_text("Youtube Link => 'Link'\
-    https://www.youtube.com/")
+@bot.callback_query_handler(func=lambda call: True)
+def query_handler(call):
+
+    bot.answer_callback_query(
+        callback_query_id=call.id, text='Answer accepted!')
+    answer = 'You made a mistake'
+    if call.data == '4':
+        answer = 'You answered correctly!'
+
+    bot.send_message(call.message.chat.id, answer)
+    bot.edit_message_reply_markup(
+        call.message.chat.id, call.message.message_id)
 
 
-def linkedIn_url(update: Update, context: CallbackContext):
-    update.message.reply_text("LinkedIn URL => \
-        https://www.linkedin.com/")
-
-
-def unknown(update: Update, context: CallbackContext):
-    update.message.reply_text("Sorry '%s' is not a valid command" %
-                              update.message.text)
-
-
-def unknown_text(update: Update, context: CallbackContext):
-    update.message.reply_text("Sorry I can't recognize you , you said '%s'" %
-                              update.message.text)
-
-
-def ban_command(update: Update, context: CallbackContext):
-    pass
-
-
-def kick_command(update: Update, context: CallbackContext):
-    pass
-
-
-def books_guide(update: Update, context: CallbackContext):
-    pass
-
-
-def Aichatbot(update: Update, context: CallbackContext):
-    pass
-
-
-updater.dispatcher.add_handler(CommandHandler('start', start))
-updater.dispatcher.add_handler(CommandHandler('youtube', youtube_url))
-updater.dispatcher.add_handler(CommandHandler('help', help))
-updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
-updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
-updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
-# Under work
-# My commands
-# updater.dispatcher.add_handler(MessageHandler('ban', ban_command))
-# updater.dispatcher.add_handler(MessageHandler('kick', kick_command))
-
-# Filters out unknown commands
-updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown))
-# Filters out unknown messages.
-updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
-
-updater.start_polling()
+bot.polling()
